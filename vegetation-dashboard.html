@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADRA Burkina Faso - Vegetation & Biomass Conservation Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 50%, #6b8e23 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(45, 80, 22, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #90EE90 !important;
+        }
+        .nav-link.active {
+            color: #90EE90 !important;
+            font-weight: 600;
+        }
+        .main-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin: 20px 0;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            padding: 20px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 5px solid #2d5016;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d5016;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .alert-custom {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            color: #856404;
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            border: none;
+            color: white;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #4a7c59, #6b8e23);
+            color: white;
+        }
+        .impact-high { color: #dc3545; font-weight: bold; }
+        .impact-medium { color: #fd7e14; font-weight: bold; }
+        .impact-low { color: #28a745; font-weight: bold; }
+        .trend-increasing { color: #dc3545; }
+        .trend-stable { color: #ffc107; }
+        .trend-decreasing { color: #28a745; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-seedling me-2"></i>ADRA Burkina Faso Dashboards
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="water-dashboard.html">
+                            <i class="fas fa-tint me-1"></i>Water
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="waste-management-dashboard.html">
+                            <i class="fas fa-recycle me-1"></i>Waste
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="vegetation-dashboard.html">
+                            <i class="fas fa-seedling me-1"></i>Vegetation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 80px;">
+        <!-- Header Section -->
+        <div class="container">
+            <div class="main-header text-center">
+                <img src="ADRA logo white and green.PNG" alt="ADRA Logo" class="img-fluid mb-3" style="max-height: 80px;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/ADRA_logo.svg/1200px-ADRA_logo.svg.png'; this.onerror=null;">
+                <h1 class="display-4 fw-bold text-success mb-3">
+                    <i class="fas fa-seedling me-3"></i>Vegetation & Biomass Conservation
+                </h1>
+                <h2 class="h4 text-muted mb-4">EIA Results - Burkina Faso Environmental Assessment</h2>
+                <p class="lead mb-4">
+                    Supporting community resilience through sustainable land management and forest conservation in Burkina Faso's grassland-savanna ecosystem.
+                </p>
+                
+                <!-- Key Findings Summary -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-success mb-1">60%</h3>
+                            <small class="text-muted">Grasslands & Savannas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-warning mb-1">50%</h3>
+                            <small class="text-muted">Vegetation Degraded</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-info mb-1">&lt;25%</h3>
+                            <small class="text-muted">Forest Coverage</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-danger mb-1">High</h3>
+                            <small class="text-muted">Charcoal Production</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Findings Alert -->
+        <div class="container mb-4">
+            <div class="alert alert-custom">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>Critical Environmental Findings</h5>
+                <p class="mb-2"><strong>Population Pressure:</strong> The arrival of IDPs has more than doubled the local population, creating unprecedented pressure on natural resources.</p>
+                <p class="mb-2"><strong>Vegetation Loss:</strong> 50% of vegetation shows degradation from deforestation, overgrazing, and agricultural clearing.</p>
+                <p class="mb-0"><strong>Soil Degradation:</strong> 50-67% of soils show signs of erosion, compaction, and fertility loss due to unsustainable practices.</p>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="container mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="metric-value">60%</div>
+                        <div class="metric-label">Grassland/Savanna Coverage</div>
+                        <small class="text-muted">Declining from 65% in 2020</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="metric-value">15%</div>
+                        <div class="metric-label">Forest Coverage</div>
+                        <small class="text-muted">Down from 20% in 2020</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="metric-value">50-67%</div>
+                        <div class="metric-label">Soil Degradation</div>
+                        <small class="text-muted">Varies by soil type</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="metric-value">2.1x</div>
+                        <div class="metric-label">Population Increase</div>
+                        <small class="text-muted">Due to IDP arrival</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="container">
+            <div class="row">
+                <!-- Vegetation Coverage Trends -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line me-2"></i>Vegetation Coverage Trends (2020-2025)
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="vegetationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil Degradation by Type -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-mountain me-2"></i>Soil Types & Degradation Status
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Main Soil Types (EIA Findings):</h6>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-warning" style="width: 45%">Clayey Soils (45%)</div>
+                                </div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-info" style="width: 35%">Loamy Soils (35%)</div>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-secondary" style="width: 20%">Other Soils (20%)</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Degradation Status:</h6>
+                                <div class="alert alert-warning mb-2">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Soil Erosion:</strong> Present and ongoing
+                                </div>
+                                <div class="alert alert-info mb-2">
+                                    <i class="fas fa-map me-2"></i>
+                                    <strong>Topography:</strong> Flatlands (325-350m elevation)
+                                </div>
+                                <div class="alert alert-danger mb-0">
+                                    <i class="fas fa-seedling me-2"></i>
+                                    <strong>Causes:</strong> Fuelwood collection, agricultural clearing, mining activities
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Degradation Causes -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar me-2"></i>Main Causes of Vegetation Degradation (EIA Findings)
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="degradationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Population Pressure Impact -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-users me-2"></i>Population Growth & Resource Pressure
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="populationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forest Activities Impact -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tree me-2"></i>Forest Activities Impact Assessment
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="forestryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EIA Findings and Mitigation Strategies -->
+        <div class="container mb-4">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-circle me-2"></i>Key Environmental Drivers
+                        </div>
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Primary Degradation Causes:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-users text-danger me-2"></i><strong>IDP Population Pressure:</strong> Doubled resource demand</li>
+                                <li class="mb-2"><i class="fas fa-fire text-warning me-2"></i><strong>Charcoal Production:</strong> Intensive fuelwood collection</li>
+                                <li class="mb-2"><i class="fas fa-tractor text-info me-2"></i><strong>Agricultural Expansion:</strong> Clearing for crop production</li>
+                                <li class="mb-2"><i class="fas fa-cow text-secondary me-2"></i><strong>Overgrazing:</strong> Livestock pressure on vegetation</li>
+                                <li class="mb-2"><i class="fas fa-industry text-dark me-2"></i><strong>Mining Activities:</strong> Multinational company exploitation</li>
+                                <li class="mb-2"><i class="fas fa-cloud-rain text-primary me-2"></i><strong>Climate Change:</strong> Irregular rainfall patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-leaf me-2"></i>Sustainable Mitigation Strategies
+                        </div>
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Community-Centered Interventions:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-seedling text-success me-2"></i><strong>Reforestation/Afforestation:</strong> Native species restoration</li>
+                                <li class="mb-2"><i class="fas fa-leaf text-success me-2"></i><strong>Agroforestry Systems:</strong> Integrated tree-crop management</li>
+                                <li class="mb-2"><i class="fas fa-recycle text-success me-2"></i><strong>Regenerative Agriculture:</strong> Soil health improvement</li>
+                                <li class="mb-2"><i class="fas fa-sync text-success me-2"></i><strong>Crop Rotation/Diversification:</strong> Sustainable farming practices</li>
+                                <li class="mb-2"><i class="fas fa-fire text-success me-2"></i><strong>Energy-Saving Cookstoves:</strong> Reduced fuelwood demand</li>
+                                <li class="mb-2"><i class="fas fa-graduation-cap text-success me-2"></i><strong>Community Training:</strong> Sustainable resource management</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Priority Matrix -->
+        <div class="container mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-tasks me-2"></i>Implementation Priority Matrix (Based on EIA Findings)
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-danger mb-3"><i class="fas fa-exclamation-circle me-2"></i>High Priority Actions</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-fire me-2 text-danger"></i>Address Charcoal Production</span>
+                                    <span class="badge bg-danger">Critical</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-industry me-2 text-warning"></i>Mining Impact Mitigation</span>
+                                    <span class="badge bg-warning">High</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-seedling me-2 text-success"></i>Reforestation Programs</span>
+                                    <span class="badge bg-success">High</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-leaf me-2 text-info"></i>Sustainable Fuelwood Alternatives</span>
+                                    <span class="badge bg-info">High</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-warning mb-3"><i class="fas fa-clock me-2"></i>Medium Priority Actions</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-tractor me-2 text-secondary"></i>Regenerative Agriculture Training</span>
+                                    <span class="badge bg-secondary">Medium</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-users me-2 text-primary"></i>Community Sensitization</span>
+                                    <span class="badge bg-primary">Medium</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-mountain me-2 text-warning"></i>Soil Erosion Control</span>
+                                    <span class="badge bg-warning">Medium</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-tree me-2 text-success"></i>Agroforestry Systems</span>
+                                    <span class="badge bg-success">Medium</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="mb-2"><i class="fas fa-lightbulb me-2 text-warning"></i>Key Insights from EIA Assessment:</h6>
+                        <ul class="mb-0 small">
+                            <li><strong>Grassland Dominance:</strong> 60% of vegetation is grasslands/savannas, requiring targeted conservation</li>
+                            <li><strong>Forest Dependency:</strong> Despite <25% forest coverage, communities strongly depend on forests</li>
+                            <li><strong>Charcoal Crisis:</strong> High charcoal production identified as primary degradation driver</li>
+                            <li><strong>Mining Pressure:</strong> Large forest areas exploited by multinational mining operations</li>
+                            <li><strong>Soil Vulnerability:</strong> Clayey and loamy soils on flatlands prone to erosion</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Locations -->
+        <div class="container mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-map-marker-alt me-2"></i>Project Areas & Environmental Status
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Critical Areas:</h6>
+                            <div class="mb-3">
+                                <strong>Lake Bam Area:</strong>
+                                <span class="badge bg-danger ms-2">High Degradation</span>
+                                <p class="small text-muted mt-1">Intensive charcoal production and agricultural pressure</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Kongoussi Region:</strong>
+                                <span class="badge bg-warning ms-2">Medium Degradation</span>
+                                <p class="small text-muted mt-1">Overgrazing and soil erosion issues</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Tikaré Area:</strong>
+                                <span class="badge bg-danger ms-2">High Degradation</span>
+                                <p class="small text-muted mt-1">Mining activities and forest loss</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Intervention Focus:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-seedling text-success me-2"></i>Establish community tree nurseries</li>
+                                <li class="mb-2"><i class="fas fa-fire text-warning me-2"></i>Distribute improved cookstoves</li>
+                                <li class="mb-2"><i class="fas fa-graduation-cap text-info me-2"></i>Train in sustainable practices</li>
+                                <li class="mb-2"><i class="fas fa-handshake text-primary me-2"></i>Form environmental committees</li>
+                                <li class="mb-2"><i class="fas fa-leaf text-success me-2"></i>Promote agroforestry techniques</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="container mb-4">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <p class="mb-2"><strong>Promoting Dignity Through Environmental Stewardship</strong></p>
+                    <p class="text-muted small mb-0">
+                        This dashboard emphasizes community-centered approaches that respect traditional practices while promoting sustainable resource management. 
+                        Our interventions recognize the resourcefulness of local communities and aim to support, rather than replace, existing knowledge systems.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Vegetation Coverage Trends Chart
+        const vegetationCtx = document.getElementById('vegetationChart').getContext('2d');
+        new Chart(vegetationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Grasslands & Savannas', 'Tropical Forest', 'Secondary Forest', 'Degraded Areas', 'Other'],
+                datasets: [{
+                    data: [60, 15, 10, 50, 15],
+                    backgroundColor: [
+                        '#90EE90',
+                        '#228B22',
+                        '#32CD32',
+                        '#CD853F',
+                        '#D2B48C'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Current Vegetation Types (EIA Findings)',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    }
+                }
+            }
+        });
+
+        // Degradation Causes Chart
+        const degradationCtx = document.getElementById('degradationChart').getContext('2d');
+        new Chart(degradationCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Charcoal Production', 'Mining & Industry', 'Overgrazing', 'Deforestation', 'Fuelwood Collection', 'Agricultural Clearing'],
+                datasets: [{
+                    label: 'Impact Level (EIA Assessment)',
+                    data: [95, 85, 80, 75, 70, 65],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#6f42c1',
+                        '#ffc107',
+                        '#20c997',
+                        '#fd7e14',
+                        '#0dcaf0'
+                    ],
+                    borderWidth: 1,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Impact Severity (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Main Causes of Vegetation Degradation (EIA Findings)',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Population Pressure Chart
+        const populationCtx = document.getElementById('populationChart').getContext('2d');
+        new Chart(populationCtx, {
+            type: 'line',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024', '2025'],
+                datasets: [{
+                    label: 'Local Population',
+                    data: [45000, 46000, 47000, 48000, 49000, 50000, 51000],
+                    borderColor: '#4a7c59',
+                    backgroundColor: 'rgba(74, 124, 89, 0.1)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'IDP Population',
+                    data: [0, 12000, 18000, 25000, 32000, 40000, 45000],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Resource Pressure Index',
+                    data: [1.0, 1.29, 1.44, 1.62, 1.80, 2.00, 2.13],
+                    borderColor: '#fd7e14',
+                    backgroundColor: 'rgba(253, 126, 20, 0.1)',
+                    type: 'line',
+                    yAxisID: 'y1',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Population'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Resource Pressure Index'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Forestry Activities Chart
+        const forestryCtx = document.getElementById('forestryChart').getContext('2d');
+        new Chart(forestryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fuelwood Collection', 'Mining Activities', 'Agricultural Clearing', 'Overgrazing', 'IDP Settlement', 'Other Activities'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 7, 3],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#6f42c1',
+                        '#fd7e14',
+                        '#ffc107',
+                        '#e83e8c',
+                        '#6c757d'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Impact Distribution by Activity (%)'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

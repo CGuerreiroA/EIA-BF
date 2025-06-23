@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burkina Faso Waste Management EIA Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 10px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #dc3545;
+            color: white;
+        }
+        .card-header.warning {
+            background-color: #fd7e14;
+        }
+        .card-header.success {
+            background-color: #198754;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .metric-label {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .chart-container {
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .risk-high { color: #dc3545; font-weight: bold; }
+        .risk-medium { color: #fd7e14; font-weight: bold; }
+        .risk-low { color: #198754; font-weight: bold; }
+        .facility-card {
+            border-left: 4px solid #198754;
+            margin-bottom: 15px;
+        }
+        #wasteMap {
+            height: 500px;
+            width: 100%;
+        }
+        .waste-type-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .gap-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .gap-critical { background-color: #dc3545; }
+        .gap-moderate { background-color: #fd7e14; }
+        .gap-low { background-color: #198754; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="ADRA logo white and green.PNG" alt="ADRA Logo" class="img-fluid" style="max-height: 80px;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/ADRA_logo.svg/1200px-ADRA_logo.svg.png'; this.onerror=null;">
+                </div>
+                <div class="col-md-10">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <div class="container-fluid">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="index.html"><i class="fas fa-water"></i> Water Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="waste-management-dashboard.html"><i class="fas fa-recycle"></i> Waste Management Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="vegetation-dashboard.html"><i class="fas fa-seedling"></i> Vegetation Dashboard</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="col-md-10">
+                    <h1 class="mb-2">Burkina Faso Waste Management EIA Dashboard</h1>
+                    <p class="lead mb-0">Environmental Impact Assessment & Mitigation Strategies for Project Areas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-heart"></i> Our Mission & Approach
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-primary" role="alert">
+                            <strong>Human life is at the heart of our mission, and delivering life-saving assistance remains our absolute priority.</strong> To ensure this aid truly supports people's well-being now and into the future, we embrace a sustainable approach. This includes utilizing voucher assistance to empower communities, implementing responsible waste management practices, and rehabilitating essential water points. <strong>These vital actions are fundamental to protecting the environment that directly sustains human life, health, and dignity.</strong>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="metric-value text-primary">Priority</div>
+                                    <div class="metric-label">Life-Saving Assistance</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="metric-value text-success">Sustainable</div>
+                                    <div class="metric-label">Environmental Approach</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="metric-value text-info">Community</div>
+                                    <div class="metric-label">Empowerment Focus</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Resilience & Resourcefulness -->
+        <h2 class="section-title">Community Resilience & Resourceful Practices</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header success">
+                        <i class="fas fa-users"></i> Existing Community Practices
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success" role="alert">
+                            <strong>Communities demonstrate remarkable resourcefulness:</strong> In challenging economic conditions, residents maximize resource use through informal but effective practices.
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-leaf text-success"></i> Organic Waste Reuse</h6>
+                            <small class="text-muted">Food scraps and organic materials used as animal feed</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-recycle text-success"></i> Material Recovery</h6>
+                            <small class="text-muted">Any reusable materials are salvaged and repurposed by necessity</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-tools text-success"></i> Creative Repurposing</h6>
+                            <small class="text-muted">Containers, packaging, and construction materials find new uses</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header warning">
+                        <i class="fas fa-lightbulb"></i> Areas for Support & Enhancement
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6><i class="fas fa-graduation-cap text-warning"></i> Formal Waste Segregation</h6>
+                            <small class="text-muted">Building on existing practices with structured sorting systems</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-shield-alt text-warning"></i> Hazardous Material Safety</h6>
+                            <small class="text-muted">Training to identify and safely handle dangerous waste</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-laptop text-warning"></i> E-Waste Awareness</h6>
+                            <small class="text-muted">Education on electronic waste risks and proper disposal</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waste Stream Analysis -->
+        <h2 class="section-title">Waste Stream Analysis & EIA Gaps</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Waste Types & Management Gaps</div>
+                    <div class="card-body">
+                        <canvas id="wasteTypesChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Current Disposal Methods</div>
+                    <div class="card-body">
+                        <canvas id="disposalMethodsChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Waste Stream Issues -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Detailed Waste Stream Assessment</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-danger">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <h6>Plastic Waste</h6>
+                                <span class="gap-indicator gap-critical"></span>
+                                <small>Incineration & unlicensed landfilling causing health problems</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-warning">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h6>Paper & Cardboard</h6>
+                                <span class="gap-indicator gap-moderate"></span>
+                                <small>Some recycling facilities available but underutilized</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-danger">
+                                    <i class="fas fa-skull-crossbones"></i>
+                                </div>
+                                <h6>Hazardous Waste</h6>
+                                <span class="gap-indicator gap-critical"></span>
+                                <small>Mixed disposal creating dangerous contamination</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-danger">
+                                    <i class="fas fa-laptop"></i>
+                                </div>
+                                <h6>E-Waste</h6>
+                                <span class="gap-indicator gap-critical"></span>
+                                <small>No segregation awareness, mixed with other waste</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-warning">
+                                    <i class="fas fa-hammer"></i>
+                                </div>
+                                <h6>Construction</h6>
+                                <span class="gap-indicator gap-moderate"></span>
+                                <small>Zero reuse/recycling during construction</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="waste-type-icon text-success">
+                                    <i class="fas fa-apple-alt"></i>
+                                </div>
+                                <h6>Organic Waste</h6>
+                                <span class="gap-indicator gap-low"></span>
+                                <small>Potential for composting & biogas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project-Specific Waste Generation & Reuse -->
+        <h2 class="section-title">Project Activities & Waste Generation</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-tools"></i> Project Activities Generating Waste
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info" role="alert">
+                            <strong>Key Project Activities:</strong> Water infrastructure rehabilitation, cash-for-work programs, and voucher assistance will generate significant waste streams that require careful management.
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="waste-type-icon text-primary">
+                                        <i class="fas fa-wrench"></i>
+                                    </div>
+                                    <h6>Water Infrastructure</h6>
+                                    <small>Pump installation, catchment basin rehabilitation</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="waste-type-icon text-success">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <h6>Cash-for-Work</h6>
+                                    <small>Community infrastructure projects</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="waste-type-icon text-warning">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <h6>Voucher Assistance</h6>
+                                    <small>Food packaging, distribution materials</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="waste-type-icon text-info">
+                                        <i class="fas fa-hand-holding-heart"></i>
+                                    </div>
+                                    <h6>Humanitarian Aid</h6>
+                                    <small>Emergency supplies, temporary materials</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Positive Examples of Material Reuse -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header success">
+                        <i class="fas fa-recycle"></i> Positive Reuse Examples
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6><i class="fas fa-th-large text-success"></i> Tiles Repurposing</h6>
+                            <small class="text-muted">Construction tiles being reused in community infrastructure projects</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-cube text-success"></i> Brick Reuse</h6>
+                            <small class="text-muted">Bricks from demolished structures repurposed for new construction</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-hammer text-success"></i> Metal Components</h6>
+                            <small class="text-muted">Steel and metal parts recovered from infrastructure projects</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-mountain text-success"></i> Concrete Aggregate</h6>
+                            <small class="text-muted">Crushed concrete reused as base material</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header warning">
+                        <i class="fas fa-exclamation-triangle"></i> Waste Generation Hotspots
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6><i class="fas fa-water text-primary"></i> Water Point Rehabilitation</h6>
+                            <small class="text-muted">Old pipes, pumps, concrete structures</small>
+                            <div class="progress mt-1">
+                                <div class="progress-bar bg-warning" style="width: 75%">High Volume</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-box text-warning"></i> Food Packaging</h6>
+                            <small class="text-muted">Voucher program packaging materials</small>
+                            <div class="progress mt-1">
+                                <div class="progress-bar bg-danger" style="width: 90%">Very High</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-tools text-secondary"></i> Construction Debris</h6>
+                            <small class="text-muted">Site clearing and rehabilitation waste</small>
+                            <div class="progress mt-1">
+                                <div class="progress-bar bg-warning" style="width: 60%">Moderate</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-truck text-info"></i> Transportation Materials</h6>
+                            <small class="text-muted">Packaging, pallets, protective materials</small>
+                            <div class="progress mt-1">
+                                <div class="progress-bar bg-info" style="width: 40%">Low-Moderate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Construction Waste Management -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-hard-hat"></i> Construction Waste Management Protocol
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="text-success">Current Best Practices</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check-circle text-success"></i> Tiles and bricks being repurposed</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Some metal component recovery</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Local material sourcing when possible</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-warning">Areas for Improvement</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-exclamation-triangle text-warning"></i> Zero formal reuse/recycling measures</li>
+                                    <li><i class="fas fa-exclamation-triangle text-warning"></i> No systematic debris sorting</li>
+                                    <li><i class="fas fa-exclamation-triangle text-warning"></i> Limited water conservation during construction</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-primary">Recommended Actions</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-arrow-right text-primary"></i> Mandatory waste sorting protocols</li>
+                                    <li><i class="fas fa-arrow-right text-primary"></i> Material recovery targets (80% reuse)</li>
+                                    <li><i class="fas fa-arrow-right text-primary"></i> Rainwater harvesting during construction</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Area Risk Assessment -->
+        <h2 class="section-title">Project Area Risk Assessment</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Waste Management Facilities & Project Locations</div>
+                    <div class="card-body">
+                        <div id="wasteMap"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Local Mitigation Resources -->
+        <h2 class="section-title">Local Waste Management Facilities</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card facility-card">
+                    <div class="card-header success">Major Recycling Facilities</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6><i class="fas fa-recycle"></i> BURKINA ECOLO TECH SARL</h6>
+                            <small class="text-muted">Ouagadougou | Recycling, Steel, Organic Waste</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-truck"></i> Africa ecologie</h6>
+                            <small class="text-muted">Ouagadougou | Hazardous Waste Transport</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-battery-half"></i> Eco Keita ahmed (EKA)</h6>
+                            <small class="text-muted">Bobo-Dioulasso | Plastic & E-Waste</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-box"></i> Eco FASO RECYCLAGE</h6>
+                            <small class="text-muted">Bobo-Dioulasso | Packaging Infrastructure</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Facility Coverage Analysis</div>
+                    <div class="card-body">
+                        <canvas id="facilityCoverageChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mitigation Strategies -->
+        <h2 class="section-title">Recommended Mitigation Strategies</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header success">Community-Based Solutions</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-users text-success"></i> Community-based waste management systems</li>
+                            <li><i class="fas fa-graduation-cap text-success"></i> Waste reduction and recycling education</li>
+                            <li><i class="fas fa-seedling text-success"></i> Organic waste composting options</li>
+                            <li><i class="fas fa-female text-success"></i> Women-led waste management committees</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header warning">Construction & Infrastructure</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-sort text-warning"></i> Mandatory waste sorting at construction sites</li>
+                            <li><i class="fas fa-recycle text-warning"></i> Material recovery protocols for debris</li>
+                            <li><i class="fas fa-tint text-warning"></i> Water conservation during construction</li>
+                            <li><i class="fas fa-map-marker-alt text-warning"></i> Designated collection points</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Training & Integration</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-hands-wash text-primary"></i> Integration into WaSH committee trainings</li>
+                            <li><i class="fas fa-hospital text-primary"></i> Hazardous waste handling for health facilities</li>
+                            <li><i class="fas fa-eye text-primary"></i> Visual guides for waste segregation</li>
+                            <li><i class="fas fa-calculator text-primary"></i> Humanitarian Carbon Calculator training</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Priority -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Simple Implementation Priority</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-danger">
+                                    <div class="card-header bg-danger text-white text-center">
+                                        <h6 class="mb-0">Start Immediately</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><i class="fas fa-shield-alt text-danger"></i> Hazardous waste safety training</li>
+                                            <li><i class="fas fa-sort text-danger"></i> Construction site sorting</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-white text-center">
+                                        <h6 class="mb-0">Next 3 Months</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><i class="fas fa-graduation-cap text-warning"></i> Community training programs</li>
+                                            <li><i class="fas fa-laptop text-warning"></i> E-waste collection points</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-success">
+                                    <div class="card-header bg-success text-white text-center">
+                                        <h6 class="mb-0">Long-term Goals</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><i class="fas fa-seedling text-success"></i> Composting systems</li>
+                                            <li><i class="fas fa-industry text-success"></i> Local recycling facilities</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Quick Reference</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-danger me-2">High Priority</span>
+                            <small>Safety & immediate risks</small>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge bg-warning me-2">Medium Priority</span>
+                            <small>Community capacity building</small>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">Long-term</span>
+                            <small>Infrastructure development</small>
+                        </div>
+                        <hr>
+                        <h6 class="text-primary">Focus Areas:</h6>
+                        <small>
+                            • Build on existing community practices<br>
+                            • Prioritize safety training<br>
+                            • Support local solutions
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Initialize charts and map
+            document.addEventListener('DOMContentLoaded', function() {
+                renderWasteTypesChart();
+                renderDisposalMethodsChart();
+                renderFacilityCoverageChart();
+                initializeWasteMap();
+            });
+
+            // Waste Types Chart
+            function renderWasteTypesChart() {
+                const ctx = document.getElementById('wasteTypesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Plastic', 'Organic', 'Paper/Cardboard', 'E-Waste', 'Hazardous', 'Construction'],
+                        datasets: [{
+                            data: [25, 30, 15, 10, 10, 10],
+                            backgroundColor: [
+                                '#dc3545', '#28a745', '#ffc107', '#6f42c1', '#fd7e14', '#6c757d'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Waste Stream Composition (%)'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Disposal Methods Chart
+            function renderDisposalMethodsChart() {
+                const ctx = document.getElementById('disposalMethodsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Incineration', 'Unlicensed Landfill', 'Mixed Disposal', 'Proper Recycling'],
+                        datasets: [{
+                            label: 'Usage (%)',
+                            data: [45, 35, 15, 5],
+                            backgroundColor: ['#dc3545', '#fd7e14', '#6c757d', '#28a745'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 50
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Current Disposal Methods'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Facility Coverage Chart
+            function renderFacilityCoverageChart() {
+                const ctx = document.getElementById('facilityCoverageChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Plastic', 'Paper', 'E-Waste', 'Hazardous', 'Organic', 'Construction'],
+                        datasets: [{
+                            label: 'Current Coverage',
+                            data: [30, 60, 20, 40, 70, 25],
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                            pointBackgroundColor: '#dc3545'
+                        }, {
+                            label: 'Required Coverage',
+                            data: [90, 85, 80, 95, 85, 80],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            pointBackgroundColor: '#28a745'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initialize Waste Management Map
+            function initializeWasteMap() {
+                const map = L.map('wasteMap').setView([12.3714, -1.5197], 7);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: ' OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Project locations
+                const projectLocations = [
+                    {name: 'Kongoussi', lat: 13.3250, lng: -1.5333, type: 'project'},
+                    {name: 'Tikaré', lat: 13.4167, lng: -2.0167, type: 'project'},
+                    {name: 'Lake Bam', lat: 13.2500, lng: -1.5000, type: 'water_body'}
+                ];
+
+                // Waste management facilities
+                const facilities = [
+                    {name: 'BURKINA ECOLO TECH SARL', lat: 12.3714, lng: -1.5197, type: 'recycling', city: 'Ouagadougou'},
+                    {name: 'Africa ecologie', lat: 12.3714, lng: -1.5197, type: 'hazardous', city: 'Ouagadougou'},
+                    {name: 'Eco Keita ahmed (EKA)', lat: 11.1775, lng: -4.2979, type: 'plastic', city: 'Bobo-Dioulasso'},
+                    {name: 'Eco FASO RECYCLAGE', lat: 11.1775, lng: -4.2979, type: 'packaging', city: 'Bobo-Dioulasso'}
+                ];
+
+                // Add project location markers
+                projectLocations.forEach(location => {
+                    const icon = location.type === 'project' ? 
+                        L.divIcon({className: 'custom-div-icon', html: '<i class="fas fa-map-marker-alt" style="color: #dc3545; font-size: 20px;"></i>'}) :
+                        L.divIcon({className: 'custom-div-icon', html: '<i class="fas fa-water" style="color: #0066cc; font-size: 20px;"></i>'});
+                    
+                    L.marker([location.lat, location.lng], {icon: icon})
+                        .addTo(map)
+                        .bindPopup(`<b>${location.name}</b><br>Type: ${location.type.replace('_', ' ')}`);
+                });
+
+                // Add facility markers
+                facilities.forEach(facility => {
+                    const color = facility.type === 'recycling' ? '#28a745' : 
+                                 facility.type === 'hazardous' ? '#dc3545' : 
+                                 facility.type === 'plastic' ? '#ffc107' : '#6f42c1';
+                    
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon', 
+                        html: `<i class="fas fa-industry" style="color: ${color}; font-size: 16px;"></i>`
+                    });
+                    
+                    L.marker([facility.lat, facility.lng], {icon: icon})
+                        .addTo(map)
+                        .bindPopup(`<b>${facility.name}</b><br>City: ${facility.city}<br>Type: ${facility.type} facility`);
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>
