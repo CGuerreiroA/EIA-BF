@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Management Dashboard - Burkina Faso EIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px;
+            padding: 30px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        .card-header.primary { background: linear-gradient(45deg, #007bff, #0056b3); color: white; }
+        .card-header.success { background: linear-gradient(45deg, #28a745, #1e7e34); color: white; }
+        .card-header.warning { background: linear-gradient(45deg, #ffc107, #e0a800); color: white; }
+        .card-header.danger { background: linear-gradient(45deg, #dc3545, #c82333); color: white; }
+        .card-header.info { background: linear-gradient(45deg, #17a2b8, #138496); color: white; }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .alert {
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+        .badge-custom {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .icon-large {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .text-energy { color: #ff6b35; }
+        .text-renewable { color: #27ae60; }
+        .text-efficiency { color: #3498db; }
+        .bg-energy { background-color: #ff6b35; }
+        .bg-renewable { background-color: #27ae60; }
+        .bg-efficiency { background-color: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <div class="text-center mb-4">
+            <img src="ADRA logo white and green.PNG" alt="ADRA Logo" class="img-fluid mb-3" style="max-height: 80px;">
+            <h1 class="display-5 fw-bold text-primary">Energy Management Dashboard</h1>
+            <p class="lead text-muted">Burkina Faso Environmental Impact Assessment - Energy Solutions</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert alert-info">
+                        <i class="fas fa-bolt"></i> <strong>Strategic Energy Assessment:</strong> Evidence-based solutions for sustainable energy management in humanitarian operations across 20,000 households in Burkina Faso
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header primary">
+                        <i class="fas fa-chart-line"></i> Energy Context - Burkina Faso National & Project Level
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="metric-value text-energy">900 kWh</div>
+                                    <div class="metric-label">Per Person Energy Use (2021)</div>
+                                    <small class="text-muted">National average - among lowest globally</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="metric-value text-renewable">0.18 GW</div>
+                                    <div class="metric-label">Solar Capacity (2023)</div>
+                                    <small class="text-muted">Rapid growth from 0 GW in 2015</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="metric-value text-efficiency">Kerosene</div>
+                                    <div class="metric-label">Primary Cooking Fuel</div>
+                                    <small class="text-muted">Target communities - EIA finding</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="metric-value text-primary">5 Vehicles</div>
+                                    <div class="metric-label">Project Fleet</div>
+                                    <small class="text-muted">1 car + 4 motorcycles (gasoline)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRITICAL ENERGY CHALLENGES -->
+        <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Addressing Critical Energy Challenges - Burkina Faso EIA Findings</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header danger">
+                        <i class="fas fa-plug"></i> Grid Reliability Crisis (Critical)
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-value text-danger">PARTIAL</div>
+                        <div class="metric-label">Grid electricity reliability</div>
+                        <hr>
+                        <h6><strong>EIA Finding:</strong> "Grid electricity - partially reliable"</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrow-right text-danger"></i> <strong>Immediate Impact:</strong> Disrupts WaSH infrastructure operations (Activity 3.3)</li>
+                            <li><i class="fas fa-arrow-right text-danger"></i> <strong>Women's Platform Risk:</strong> SMS early warning systems unreliable (Activity 1.2)</li>
+                            <li><i class="fas fa-arrow-right text-danger"></i> <strong>Community Solution:</strong> Solar backup systems for critical infrastructure</li>
+                            <li><i class="fas fa-arrow-right text-danger"></i> <strong>First Responder Impact:</strong> Communication equipment failures during emergencies</li>
+                        </ul>
+                        <div class="alert alert-danger small">
+                            <strong>Ground Reality:</strong> Unreliable electricity threatens life-saving humanitarian operations
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header warning">
+                        <i class="fas fa-fire"></i> Cooking Fuel & Indoor Air Quality
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-value text-warning">Kerosene</div>
+                        <div class="metric-label">Primary household cooking fuel</div>
+                        <hr>
+                        <h6><strong>EIA Gaps Identified:</strong></h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrow-right text-warning"></i> <strong>Health Risk:</strong> Indoor air pollution affects women and children in 20,000 households</li>
+                            <li><i class="fas fa-arrow-right text-warning"></i> <strong>Economic Burden:</strong> Kerosene costs strain vulnerable household budgets</li>
+                            <li><i class="fas fa-arrow-right text-warning"></i> <strong>Improved Stoves (Activity 2.2):</strong> Cash-for-work programs building efficient biomass stoves</li>
+                            <li><i class="fas fa-arrow-right text-warning"></i> <strong>Nutrition Integration:</strong> Efficient cooking supports food security programs (45% of activities)</li>
+                        </ul>
+                        <div class="alert alert-warning small">
+                            <strong>What Works:</strong> Traditional + improved biomass stoves already in use - build on this!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header info">
+                        <i class="fas fa-truck"></i> Transportation & Logistics Efficiency
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-value text-info">Gasoline</div>
+                        <div class="metric-label">Vehicle fuel dependency</div>
+                        <hr>
+                        <h6><strong>EIA Challenges:</strong></h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrow-right text-info"></i> <strong>Route Optimization:</strong> Lack of alternative routes increases fuel consumption</li>
+                            <li><i class="fas fa-arrow-right text-info"></i> <strong>Security Constraints:</strong> Logistics partners reduce movement, increasing costs</li>
+                            <li><i class="fas fa-arrow-right text-info"></i> <strong>Shared Transport:</strong> Collaboration with other projects reduces emissions</li>
+                            <li><i class="fas fa-arrow-right text-info"></i> <strong>Local Sourcing:</strong> Some supplies sourced locally to minimize transportation</li>
+                        </ul>
+                        <div class="alert alert-info small">
+                            <strong>Current Practice:</strong> Route planning and efficient vehicles already implemented
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMUNITY-DRIVEN ENERGY SOLUTIONS -->
+        <h2 class="section-title"><i class="fas fa-users"></i> Community-Driven Energy Solutions - Building on Local Strengths</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header success">
+                        <i class="fas fa-solar-panel"></i> Solar Energy for Critical Infrastructure
+                    </div>
+                    <div class="card-body">
+                        <h6><strong>Strategic Integration with Project Activities:</strong></h6>
+                        <ul>
+                            <li><strong>WaSH Infrastructure (Activity 3.3):</strong> Solar-powered water pumps and treatment systems ensuring 24/7 operation</li>
+                            <li><strong>Early Warning Systems (Activity 1.2):</strong> Solar-powered communication hubs for women's platform messaging</li>
+                            <li><strong>Health Centers:</strong> Solar backup for vaccine storage and emergency medical equipment</li>
+                            <li><strong>Community Centers:</strong> Solar lighting for evening meetings and literacy programs</li>
+                        </ul>
+                        <div class="alert alert-success">
+                            <strong>Burkina Faso Advantage:</strong> National solar capacity grew from 0 to 0.18 GW (2015-2023) - infrastructure and expertise available
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header success">
+                        <i class="fas fa-leaf"></i> Improved Biomass & Cooking Solutions
+                    </div>
+                    <div class="card-body">
+                        <h6><strong>Building on Existing Community Practices:</strong></h6>
+                        <ul>
+                            <li><strong>Women-Led Training (Activity 2.1):</strong> Women first responders teach efficient cooking techniques</li>
+                            <li><strong>Cash-for-Work (Activity 2.2):</strong> IDPs and host communities build improved biomass stoves</li>
+                            <li><strong>Nutrition Programs:</strong> Efficient cooking reduces fuel costs, increases food budget</li>
+                            <li><strong>Health Co-Benefits:</strong> Reduced indoor air pollution improves respiratory health</li>
+                        </ul>
+                        <div class="alert alert-success">
+                            <strong>Community Voice:</strong> "Traditional biomass stove + improved biomass stove" - EIA shows willingness to adopt efficient technologies
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENVIRONMENTAL FOOTPRINT REDUCTION -->
+        <h2 class="section-title"><i class="fas fa-leaf"></i> Environmental Footprint Reduction - Practical Energy Approaches</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header info">
+                        <i class="fas fa-chart-bar"></i> Planned Energy Efficiency Measures (Proposed Implementation)
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-route icon-large text-primary"></i>
+                                        <h6>Transportation Efficiency</h6>
+                                        <ul class="list-unstyled small">
+                                            <li>Route planning optimization</li>
+                                            <li>Shared transportation coordination</li>
+                                            <li>Local sourcing prioritization</li>
+                                            <li>Fuel consumption monitoring</li>
+                                        </ul>
+                                        <span class="badge bg-primary">Immediate</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-solar-panel icon-large text-warning"></i>
+                                        <h6>Solar Infrastructure</h6>
+                                        <ul class="list-unstyled small">
+                                            <li>Critical facility backup power</li>
+                                            <li>Water pumping systems</li>
+                                            <li>Communication equipment</li>
+                                            <li>Community lighting</li>
+                                        </ul>
+                                        <span class="badge bg-warning">Phase 2</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-fire icon-large text-success"></i>
+                                        <h6>Cooking Efficiency</h6>
+                                        <ul class="list-unstyled small">
+                                            <li>Improved biomass stove construction</li>
+                                            <li>Efficient cooking training</li>
+                                            <li>Fuel conservation techniques</li>
+                                            <li>Indoor air quality improvement</li>
+                                        </ul>
+                                        <span class="badge bg-success">Ongoing</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cogs icon-large text-info"></i>
+                                        <h6>Energy Management</h6>
+                                        <ul class="list-unstyled small">
+                                            <li>Equipment efficiency standards</li>
+                                            <li>Energy consumption monitoring</li>
+                                            <li>Maintenance protocols</li>
+                                            <li>Community energy committees</li>
+                                        </ul>
+                                        <span class="badge bg-info">Systematic</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STRATEGIC ADVANTAGE -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header primary">
+                        <i class="fas fa-rocket"></i> Strategic Advantage Through Evidence-Based Energy Management
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6><i class="fas fa-trophy text-warning"></i> Programmatic Benefits (Potential)</h6>
+                                <ul class="small">
+                                    <li><strong>Risk Prevention:</strong> Solar backup systems would ensure critical infrastructure operates during grid failures</li>
+                                    <li><strong>Cost Reduction:</strong> Improved cooking efficiency could reduce household fuel expenses by 30-50%</li>
+                                    <li><strong>Health Integration:</strong> Efficient cooking technologies would reduce indoor air pollution, supporting health outcomes</li>
+                                    <li><strong>Women's Empowerment:</strong> Energy-efficient technologies could reduce time burden for fuel collection and cooking</li>
+                                    <li><strong>Climate Resilience:</strong> Reduced dependence on unreliable grid and fossil fuels</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <h6><i class="fas fa-heartbeat text-danger"></i> Field Impact (Potential)</h6>
+                                <ul class="small">
+                                    <li><strong>Emergency Response:</strong> Reliable power systems would ensure early warning systems function during crises</li>
+                                    <li><strong>Water Security:</strong> Solar-powered water systems could provide consistent access for 20,000 households</li>
+                                    <li><strong>Health Protection:</strong> Improved cooking practices would reduce respiratory illness in women and children</li>
+                                    <li><strong>Economic Relief:</strong> Lower energy costs would free up household income for food and healthcare</li>
+                                    <li><strong>Community Safety:</strong> Solar lighting installations could improve security around water points and community centers</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <h6><i class="fas fa-cogs text-info"></i> Implementation Strategy (Proposed)</h6>
+                                <ul class="small">
+                                    <li><strong>Phase 1 (Proposed):</strong> Transportation efficiency and route optimization based on EIA findings</li>
+                                    <li><strong>Phase 2 (Potential):</strong> Solar systems for critical WaSH and communication infrastructure</li>
+                                    <li><strong>Phase 3 (Planned):</strong> Improved cooking stove programs through women's platforms</li>
+                                    <li><strong>Phase 4 (Future):</strong> Community energy management committees and maintenance protocols</li>
+                                    <li><strong>Integration Points:</strong> Energy efficiency could be embedded in DRR (30%), food security (45%), and WaSH (25%) activities</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <h6><i class="fas fa-check-circle text-success"></i> Ground-Level Feasibility (Assessment)</h6>
+                                <ul class="small">
+                                    <li><strong>National Capacity:</strong> Burkina Faso solar sector growing rapidly (0.18 GW installed) - infrastructure available</li>
+                                    <li><strong>Community Readiness:</strong> Traditional and improved biomass stoves already accepted</li>
+                                    <li><strong>Partner Expertise:</strong> ADRA Burkina Faso has infrastructure implementation experience</li>
+                                    <li><strong>Local Resources:</strong> Solar equipment and biomass materials available locally</li>
+                                    <li><strong>Proven Technology:</strong> Simple, robust solutions appropriate for humanitarian contexts</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-warning">
+                                    <h6><i class="fas fa-exclamation-triangle"></i> <strong>What EIA Can Prevent:</strong></h6>
+                                    <ul class="mb-0 small">
+                                        <li>Critical infrastructure failures during grid outages</li>
+                                        <li>Continued health risks from inefficient cooking practices</li>
+                                        <li>Wasted resources on energy-intensive approaches</li>
+                                        <li>Missed opportunities to build energy resilience</li>
+                                        <li>Higher operational costs from fuel inefficiency</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h6><i class="fas fa-lightbulb"></i> <strong>What EIA Can Enable:</strong></h6>
+                                    <ul class="mb-0 small">
+                                        <li>Reliable energy systems for life-saving humanitarian operations</li>
+                                        <li>Community-appropriate technology solutions</li>
+                                        <li>Integration of energy efficiency across all project activities</li>
+                                        <li>Building on national renewable energy momentum</li>
+                                        <li>Clear pathway from emergency response to sustainable energy systems</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-primary">
+                            <i class="fas fa-bullseye"></i> <strong>Bottom Line:</strong> The EIA can transform energy management from an operational challenge into a strategic advantage. We now have evidence-based recommendations that can enable reliable operations, reduce costs, improve health outcomes, and build community resilience - all while being immediately implementable through existing project structures and national energy infrastructure in Burkina Faso.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="text-center mt-4 pt-3 border-top">
+            <p class="text-muted small">
+                <i class="fas fa-info-circle"></i> This dashboard presents Environmental Impact Assessment findings and strategic energy solutions for ADRA's humanitarian operations in Burkina Faso. 
+                All metrics and interventions are proposed/planned based on EIA evidence and community consultation.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
